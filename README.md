@@ -5,21 +5,6 @@ A modern C++17 multi-threaded sensor pipeline simulating real-time IMU data proc
 
 ---
 
-# Features
-
-- Multi-threaded producer-consumer architecture
-- Thread-safe bounded queue implementation
-- Asynchronous sensor data processing
-- Atomic synchronization and deterministic shutdown handling
-- RAII-based thread lifecycle management
-- Latency profiling using `std::chrono`
-- Unit testing with GoogleTest
-- AddressSanitizer (ASan) and ThreadSanitizer (TSan) support
-- CMake-based build system
-- Modern C++17 design principles
-
----
-
 # Architecture
 
 The pipeline is divided into three main components:
@@ -45,6 +30,18 @@ The pipeline state is controlled using atomic variables to ensure safe thread sh
   std::atomic                                   std::chrono
   <bool> running                                timing stats
 ```
+# Features
+
+- Multi-threaded producer-consumer architecture
+- Thread-safe bounded queue implementation
+- Asynchronous sensor data processing
+- Atomic synchronization and deterministic shutdown handling
+- RAII-based thread lifecycle management
+- Latency profiling using `std::chrono`
+- Unit testing with GoogleTest
+- AddressSanitizer (ASan) and ThreadSanitizer (TSan) support
+- CMake-based build system
+- Modern C++17 design principles
 
 ---
 
