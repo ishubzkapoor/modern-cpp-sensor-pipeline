@@ -1,0 +1,12 @@
+.vs/
+vcpkg/
+out/
+build/
+Debug/
+Release/
+
+*.exe
+*.obj
+*.pdb
+*.ilk
+*.log
