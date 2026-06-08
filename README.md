@@ -1,92 +1,91 @@
-````md
-# Modern C++ Sensor Pipeline
+# Modern C++ IMU Sensor Pipeline
 
-A modern C++17 multi-threaded sensor pipeline simulating real-time IMU data processing using a producer-consumer architecture. The project demonstrates concurrent programming, bounded queues, RAII-based thread management, synchronization primitives, profiling, and sanitizer-based debugging workflows commonly used in embedded, robotics, and sensor-processing systems.
+This project is a small C++17 sensor-processing pipeline that simulates how IMU data can be collected, passed between threads, processed, and logged in real time.
+
+The main goal of the project is to demonstrate clean C++ design, safe multi-threading, and basic real-time sensor data handling.
 
 ---
 
-# Architecture
+## Overview
 
-The pipeline is divided into three main components:
+The pipeline has three main parts:
 
-- **IMU Thread (Producer)**  
-  Simulates IMU sensor readings at 100 Hz and continuously generates timestamped acceleration data.
+1. **IMU Producer Thread**
+   Generates simulated IMU acceleration data at 100 Hz.
 
-- **Filter Queue (Bounded Queue)**  
-  Acts as a thread-safe communication layer between producer and consumer threads. The queue uses mutexes and condition variables to safely synchronize concurrent access.
+2. **Thread-Safe Queue**
+   Stores sensor readings safely between the producer and consumer threads.
 
-- **Logger / Consumer Thread**  
-  Asynchronously retrieves sensor readings from the queue, computes processing statistics, and measures end-to-end latency using `std::chrono`.
-
-The pipeline state is controlled using atomic variables to ensure safe thread shutdown and predictable execution behavior.
+3. **Logger / Consumer Thread**
+   Reads the sensor data asynchronously, processes it, and measures timing information using `std::chrono`.
 
 ```text
 ┌──────────────┐       ┌──────────────┐       ┌──────────────┐
-│  IMU Thread  │──────▶│ Filter Queue │──────▶│  Logger      │
-│  (Producer)  │  push │ (Bounded)    │  pop  │  (Consumer)  │
+│  IMU Thread  │──────▶│ Sensor Queue │──────▶│  Logger      │
+│  Producer    │       │ Thread-safe  │       │  Consumer    │
 │  100 Hz      │       │ mutex + cv   │       │  Async       │
 └──────────────┘       └──────────────┘       └──────────────┘
-       │                                              │
-  std::atomic                                   std::chrono
-  <bool> running                                timing stats
 ```
-# Features
 
-- Multi-threaded producer-consumer architecture
-- Thread-safe bounded queue implementation
-- Asynchronous sensor data processing
-- Atomic synchronization and deterministic shutdown handling
-- RAII-based thread lifecycle management
-- Latency profiling using `std::chrono`
-- Unit testing with GoogleTest
-- AddressSanitizer (ASan) and ThreadSanitizer (TSan) support
-- CMake-based build system
-- Modern C++17 design principles
+The pipeline uses atomic variables to start and stop the system safely.
 
 ---
 
-# Concepts Used
+## What This Project Shows
 
-| Concepts |
-|---|
-| `constexpr`, `std::string_view` |
-| `std::array`, fixed-capacity containers |
-| `enum class` |
-| RAII and move semantics |
-| `[[nodiscard]]`, lambdas, `std::optional` |
-| Encapsulation and const correctness |
-| Templates |
-| Threads, mutexes, condition variables, atomics |
-| Sanitizers and debugging workflows |
-| `std::chrono` profiling |
+* Real-time-style IMU data generation
+* Producer-consumer architecture
+* Safe communication between threads
+* Thread-safe queue implementation
+* Use of mutexes and condition variables
+* Atomic flag for safe pipeline shutdown
+* Basic timing measurement with `std::chrono`
+* CMake-based build workflow
+* Modern C++17 coding style
 
 ---
 
-# Project Structure
+## Concepts Used
+
+| C++ / Software Concept |
+| ---------------------- |
+| Modern C++17           |
+| Threads                |
+| Mutexes                |
+| Condition variables    |
+| Atomic variables       |
+| RAII                   |
+| Move semantics         |
+| Templates              |
+| `std::optional`        |
+| `std::chrono`          |
+| CMake                  |
+
+---
+
+## Project Structure
 
 ```text
 .
 ├── CMakeLists.txt
 ├── main.cpp
 ├── sensor_pipeline.hpp
-├── test_pipeline.cpp
 └── README.md
 ```
 
 ---
 
-# Build Instructions
+## Build Instructions
 
-## Requirements
+### Requirements
 
-- CMake ≥ 3.16
-- C++17 compatible compiler
-- Linux recommended
-- GoogleTest (optional for unit testing)
+* CMake 3.16 or newer
+* C++17 compatible compiler
+* Linux recommended
 
 ---
 
-## Build
+### Build and Run
 
 ```bash
 mkdir build
@@ -94,11 +93,7 @@ cd build
 
 cmake ..
 make -j$(nproc)
-```
 
-Run the executable:
-
-```bash
 ./sensor_pipeline
 ```
 
@@ -111,136 +106,28 @@ Example output:
 
 ---
 
-# Enable AddressSanitizer
+## Possible Extensions
 
-AddressSanitizer helps detect:
-- memory leaks
-- invalid memory access
-- buffer overflows
+This project can be extended into more advanced sensor-processing systems, such as:
 
-```bash
-cmake -DENABLE_ASAN=ON -DCMAKE_BUILD_TYPE=Debug ..
-make -j$(nproc)
-
-./sensor_pipeline
-```
-
----
-
-# Enable ThreadSanitizer
-
-ThreadSanitizer helps detect:
-- data races
-- synchronization issues
-- unsafe concurrent access
-
-```bash
-cmake -DENABLE_TSAN=ON -DCMAKE_BUILD_TYPE=Debug ..
-make -j$(nproc)
-
-./sensor_pipeline
-```
+* unit testing with GoogleTest
+* AddressSanitizer and ThreadSanitizer support
+* CPU and heap profiling
+* sensor fusion pipelines
+* UAV telemetry processing
+* radar or SDR data pipelines
+* embedded Linux sensor applications
+* real hardware IMU integration
+* Kalman filtering
+* UDP/TCP data streaming
+* multi-producer and multi-consumer systems
 
 ---
 
-# Unit Tests
+## Purpose
 
-Enable tests:
+This project was built as a portfolio project to practice modern C++17, multi-threading, synchronization, and real-time-style sensor data processing.
 
-```bash
-cmake -DBUILD_TESTS=ON ..
-make -j$(nproc)
-
-ctest
-```
-
-Included tests:
-
-| Test | Description |
-|---|---|
-| PushPopRoundTrip | Verifies queue push/pop behavior |
-| ShutdownUnblocksConsumer | Ensures shutdown safely wakes waiting threads |
-| ProcessesReadings | Confirms pipeline processes sensor data |
-| RapidStartStop | Stress-tests RAII thread cleanup |
+It is especially relevant for embedded systems, robotics, sensor software, radar processing, and measurement system applications.
 
 ---
-
-# Profiling Workflow
-
-## Build for Profiling
-
-```bash
-cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
-make -j$(nproc)
-```
-
-## CPU Profiling with perf
-
-```bash
-perf record -g --call-graph dwarf ./sensor_pipeline
-```
-
-Generate FlameGraph:
-
-```bash
-perf script | stackcollapse-perf.pl | flamegraph.pl > pipeline_flame.svg
-```
-
----
-
-## Heap Allocation Profiling
-
-```bash
-heaptrack ./sensor_pipeline
-```
-
-Useful for:
-- identifying unnecessary allocations
-- analyzing memory usage
-- optimizing hot execution paths
-
----
-
-# Thread Safety Notes
-
-The implementation avoids common concurrency issues by:
-- protecting shared state with mutexes
-- synchronizing threads using condition variables
-- using atomic variables for lightweight state management
-- ensuring safe shutdown behavior without deadlocks
-
-The consumer thread avoids unsafe patterns such as checking queue size outside synchronization scopes to prevent race conditions.
-
----
-
-# Example Applications
-
-This architecture can be extended for:
-- sensor fusion pipelines
-- robotics systems
-- UAV telemetry processing
-- radar and SDR applications
-- embedded Linux systems
-- real-time measurement systems
-- communication system simulations
-
----
-
-# Future Improvements
-
-Potential future extensions include:
-- multi-producer and multi-consumer support
-- lock-free queue implementation
-- Kalman filtering
-- binary logging
-- real hardware sensor integration
-- UDP/TCP streaming
-- SIMD optimization
-- benchmark framework integration
-
----
-
-# License
-
-This project is intended for educational and portfolio purposes.
-````
