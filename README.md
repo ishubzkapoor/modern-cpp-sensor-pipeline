@@ -131,3 +131,48 @@ This project was built as a portfolio project to practice modern C++17, multi-th
 It is especially relevant for embedded systems, robotics, sensor software, radar processing, and measurement system applications.
 
 ---
+## Runtime Visualization and Animation
+
+The C++ pipeline logs runtime data into a CSV file called `pipeline_log.csv`. A small Python visualization script reads this file and creates an animated GIF of the pipeline behavior.
+
+The animation shows how the sensor data moves through the system during execution:
+
+* simulated IMU `accel_z` data
+* queue occupancy between producer and consumer threads
+* processing latency in microseconds
+* current pipeline status, including sample ID, queue size, latency, and processed count
+
+![C++ IMU Pipeline Runtime Visualization](cpp_pipeline_animation.gif)
+
+The GIF should animate directly inside the GitHub README when the file is uploaded correctly and placed in the same folder as `README.md`.
+
+This makes the project easier to understand because it shows the runtime behavior of the multi-threaded pipeline, instead of only showing terminal output.
+
+---
+
+## Visualization Workflow
+
+```text
+C++ IMU Pipeline
+        │
+        ▼
+pipeline_log.csv
+        │
+        ▼
+Python Visualization Script
+        │
+        ▼
+cpp_pipeline_animation.gif
+```
+
+To run the visualization script:
+
+```bash
+python visualize_pipeline.py
+```
+
+The output file is:
+
+```text
+cpp_pipeline_animation.gif
+```
